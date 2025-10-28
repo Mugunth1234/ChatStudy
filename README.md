@@ -73,55 +73,57 @@ Client-server chat applications are versatile tools that facilitate real-time co
 
 Client-server chat applications are foundational to real-time communication over networks. They incorporate principles of socket programming, communication protocols, and security mechanisms to provide a seamless user experience. Understanding the basics of client-server chat applications is essential for developers involved in networked application development, as they form the backbone of various collaborative communication systems. As technology evolves, chat applications continue to adapt, incorporating new features and technologies to enhance user interaction and connectivity.
 ## program:
+sever.py
 ```
-server.py
-
 import socket
+from datetime import datetime
 
-# Server setup
-host = '127.0.0.1'   # Localhost
-port = 5000          # Port number
+# Create a socket object
+s = socket.socket()
+s.bind(('localhost', 8000))
+s.listen(5)
 
-server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-server_socket.bind((host, port))
-server_socket.listen(1)
+print("Server is listening...")
 
-print("Server is listening on", host, ":", port)
-conn, addr = server_socket.accept()
-print("Connection from:", addr)
+# Accept a client connection
+c, addr = s.accept()
+print("Client Address:", addr)
 
-while True:
-    data = conn.recv(1024).decode()
-    if not data:
-        break
-    print("Client:", data)
-    message = input("Server: ")
-    conn.send(message.encode())
+# Send current date and time to client
+now = datetime.now()
+c.send(now.strftime("%d/%m/%Y %H:%M:%S").encode())
 
-conn.close()
+# Receive acknowledgement from client
+ack = c.recv(1024).decode()
+if ack:
+    print("Received from client:", ack)
 
+# Close connection
+c.close()
+```
 client.py
-
+```
 import socket
 
-# Client setup
-host = '127.0.0.1'   # Same as server
-port = 5000
+# Create a socket object
+s = socket.socket()
+s.connect(('localhost', 8000))
 
-client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-client_socket.connect((host, port))
+# Display client's own address
+print("Client socket:", s.getsockname())
 
-while True:
-    message = input("Client: ")
-    client_socket.send(message.encode())
-    data = client_socket.recv(1024).decode()
-    print("Server:", data)
+# Receive message from server
+data = s.recv(1024).decode()
+print("Message from server:", data)
 
-client_socket.close()
+# Send acknowledgement
+s.send("Acknowledgement received from client".encode())
 
+# Close connection
+s.close()
 ```
 ## output:
-<img width="1358" height="330" alt="image" src="https://github.com/user-attachments/assets/6bd66732-0cee-440d-8c59-901b4b64c48d" />
+<img width="1916" height="1111" alt="image" src="https://github.com/user-attachments/assets/1f681e6c-7c55-4486-b4b1-340ac54ebd6e" />
 
 ## Result:
 
